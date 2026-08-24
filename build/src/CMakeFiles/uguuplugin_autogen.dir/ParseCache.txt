@@ -362,6 +362,7 @@
  mdp:/usr/include/qt6/QtCore/QEvent
  mdp:/usr/include/qt6/QtCore/QExplicitlySharedDataPointer
  mdp:/usr/include/qt6/QtCore/QFile
+ mdp:/usr/include/qt6/QtCore/QFileInfo
  mdp:/usr/include/qt6/QtCore/QFlags
  mdp:/usr/include/qt6/QtCore/QIODevice
  mdp:/usr/include/qt6/QtCore/QJsonArray
@@ -435,6 +436,7 @@
  mdp:/usr/include/qt6/QtCore/qexceptionhandling.h
  mdp:/usr/include/qt6/QtCore/qfile.h
  mdp:/usr/include/qt6/QtCore/qfiledevice.h
+ mdp:/usr/include/qt6/QtCore/qfileinfo.h
  mdp:/usr/include/qt6/QtCore/qflags.h
  mdp:/usr/include/qt6/QtCore/qfloat16.h
  mdp:/usr/include/qt6/QtCore/qforeach.h
@@ -517,6 +519,7 @@
  mdp:/usr/include/qt6/QtCore/qtenvironmentvariables.h
  mdp:/usr/include/qt6/QtCore/qtextstream.h
  mdp:/usr/include/qt6/QtCore/qtformat_impl.h
+ mdp:/usr/include/qt6/QtCore/qtimezone.h
  mdp:/usr/include/qt6/QtCore/qtmetamacros.h
  mdp:/usr/include/qt6/QtCore/qtnoop.h
  mdp:/usr/include/qt6/QtCore/qtpreprocessorsupport.h

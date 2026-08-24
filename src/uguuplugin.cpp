@@ -14,6 +14,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QFileInfo>
 
 class UguuShareJob : public Purpose::Job
 {
@@ -34,7 +35,6 @@ public:
             emitResult();
             return;
         }
-        
     for (const QJsonValue &val : urls) {
         QString u = val.toString();
         KIO::StoredTransferJob *job = KIO::storedGet(QUrl(u));
@@ -56,29 +56,45 @@ public:
     
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
     QHttpPart imagePart;
-    imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("image/jpeg"));
-    imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"files[]\""));
-    
+    imagePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("image/png"));
     QFile *screenshot = new QFile(job->url().toLocalFile());
     screenshot->open(QIODevice::ReadOnly);
+    imagePart.setHeader(
+    QNetworkRequest::ContentDispositionHeader,
+    QVariant(
+        QStringLiteral(
+            "form-data; name=\"files[]\"; filename=\"%1\""
+        ).arg(QFileInfo(screenshot->fileName()).fileName())
+    )
+);
+    
+
     imagePart.setBodyDevice(screenshot);
-    screenshot->setParent(multiPart); 
+    screenshot->setParent(multiPart); // need to invistigate
     
     multiPart->append(imagePart);
 
     QUrl server("https://uguu.se/upload");
     QNetworkRequest request(server);
 
-    QNetworkAccessManager manager;
-    QNetworkReply *reply = manager.post(request, multiPart);
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    QNetworkReply *reply = manager->post(request, multiPart);
     
-    multiPart->setParent(reply);
+    multiPart->setParent(reply); // need to invistigate
+    
+    connect(reply, &QNetworkReply::finished, this, &UguuShareJob::fileUploaded);
+    
+}
+   
+void fileUploaded()
+{
+    qWarning() << "Uguu: fileUploaded() started";
+    auto *reply = qobject_cast<QNetworkReply *>(sender());
+    
     QVariant statusCodeVariant = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
 
     qWarning() << "Uguu: file uploaded with the following status code :" << statusCodeVariant;
-
 }
-    
 
 };
 
