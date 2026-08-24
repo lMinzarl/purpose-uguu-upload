@@ -1,0 +1,19 @@
+{
+    "KPlugin": {
+        "Name": "Upload to Uguu",
+        "Description": "Upload screenshots temporarily to Uguu",
+        "Icon": "cloud-upload",
+        "License": "GPL-2.0-or-later"
+    },
+    "X-Purpose-ActionDisplay": "Upload to Uguu",
+    "X-Purpose-Configuration": [],
+    "X-Purpose-Constraints": [
+        [
+            "mimeType:image/png",
+            "mimeType:image/jpeg"
+        ]
+    ],
+    "X-Purpose-PluginTypes": [
+        "Export"
+    ]
+}
