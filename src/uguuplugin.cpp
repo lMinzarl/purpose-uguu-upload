@@ -15,6 +15,8 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QFileInfo>
+#include <QGuiApplication>
+#include <QClipboard>
 
 class UguuShareJob : public Purpose::Job
 {
@@ -194,6 +196,18 @@ void fileUploaded()
     );
 
     reply->deleteLater();
+    QGuiApplication::clipboard()->setText(url);
+
+    KNotification::event(
+    KNotification::Notification,
+    QStringLiteral("Uguu Upload"),
+    QStringLiteral(
+        "Upload complete.<br>"
+        "<a href=\"%1\">%1</a><br><br>"
+        "The URL has been copied to the clipboard."
+    ).arg(url),
+    KNotification::Persistent
+    );
 
     emitResult();
 }

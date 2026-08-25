@@ -424,6 +424,8 @@
  mdp:/usr/include/qt6/QtCore/qcontainerinfo.h
  mdp:/usr/include/qt6/QtCore/qcontainertools_impl.h
  mdp:/usr/include/qt6/QtCore/qcontiguouscache.h
+ mdp:/usr/include/qt6/QtCore/qcoreapplication.h
+ mdp:/usr/include/qt6/QtCore/qcoreapplication_platform.h
  mdp:/usr/include/qt6/QtCore/qcoreevent.h
  mdp:/usr/include/qt6/QtCore/qcryptographichash.h
  mdp:/usr/include/qt6/QtCore/qdarwinhelpers.h
@@ -538,13 +540,19 @@
  mdp:/usr/include/qt6/QtCore/qversiontagging.h
  mdp:/usr/include/qt6/QtCore/qxptype_traits.h
  mdp:/usr/include/qt6/QtCore/qyieldcpu.h
+ mdp:/usr/include/qt6/QtGui/QClipboard
+ mdp:/usr/include/qt6/QtGui/QGuiApplication
  mdp:/usr/include/qt6/QtGui/QPixmap
  mdp:/usr/include/qt6/QtGui/QWindow
  mdp:/usr/include/qt6/QtGui/qbitmap.h
+ mdp:/usr/include/qt6/QtGui/qclipboard.h
  mdp:/usr/include/qt6/QtGui/qcolor.h
  mdp:/usr/include/qt6/QtGui/qcursor.h
+ mdp:/usr/include/qt6/QtGui/qguiapplication.h
+ mdp:/usr/include/qt6/QtGui/qguiapplication_platform.h
  mdp:/usr/include/qt6/QtGui/qicon.h
  mdp:/usr/include/qt6/QtGui/qimage.h
+ mdp:/usr/include/qt6/QtGui/qinputmethod.h
  mdp:/usr/include/qt6/QtGui/qpaintdevice.h
  mdp:/usr/include/qt6/QtGui/qpixelformat.h
  mdp:/usr/include/qt6/QtGui/qpixmap.h
