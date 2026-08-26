@@ -2,7 +2,6 @@
 #include <purpose/job.h>
 #include <purpose/pluginbase.h>
 #include <KNotification>
-#include <KIO/StoredTransferJob>
 #include <KJob>
 #include <QJsonArray>
 #include <QJsonValue>
