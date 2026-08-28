@@ -29,16 +29,26 @@ public:
 
     void start() override
     {
-        qWarning() << "Uguu: start() called";
+        qDebug() << "Uguu: start() called";
         const QJsonArray urls = data().value(QLatin1String("urls")).toArray();
-        qWarning() << "Uguu: data() contains the following: " << data();
+        qDebug() << "Uguu: data() contains the following: " << data();
         if (urls.isEmpty()) {
-            qWarning() << "no urls to share" << urls << data();
+            qCritical() << "Uguu: No file was provided.";
+            setError(1);
+            setErrorText(QStringLiteral("No file was provided."));
             emitResult();
             return;
         }
         for (qsizetype i = 0; i < urls.size(); ++i) {
-            qWarning() << "Uguu URL" << i << ":" << urls.at(i).toString();
+            qInfo() << "Uguu: file url " << i << ":" << urls.at(i).toString();
+        }
+
+        if (urls.size() != 1) {
+            qCritical() << "Uguu: Uguu upload currently supports one file at a time.";
+            setError(1);
+            setErrorText(QStringLiteral("Uguu upload currently supports one file at a time."));
+            emitResult();
+            return;
         }
         const QString input = urls.first().toString();
 
@@ -52,13 +62,13 @@ public:
 
         filePath = input;
         }
-        qWarning() << "Uguu: local screenshot:" << filePath;
+        qInfo() << "Uguu: local screenshot:" << filePath;
         uploadFile(filePath);
     }
 
    void uploadFile(const QString &filePath)
 {
-    qWarning() << "Uguu: uploadFile() called";
+    qDebug() << "Uguu: uploadFile() called";
 
     auto *multiPart =
         new QHttpMultiPart(QHttpMultiPart::FormDataType);
@@ -68,7 +78,7 @@ public:
     auto *screenshot = new QFile(filePath);
 
     if (!screenshot->open(QIODevice::ReadOnly)) {
-        qWarning() << "Uguu: couldn't open screenshot:"
+        qCritical() << "Uguu: could not open screenshot."
                    << screenshot->errorString();
 
         delete screenshot;
@@ -95,7 +105,7 @@ public:
     multiPart->append(imagePart);
 
     QNetworkRequest request(
-        QUrl(QStringLiteral("https://uguu.se/upload.php"))
+        QUrl(QStringLiteral("https://uguu.se/upload"))
     );
 
     auto *manager =
@@ -116,11 +126,12 @@ public:
    
 void fileUploaded()
 {
-    qWarning() << "Uguu: fileUploaded() started";
+    qDebug() << "Uguu: fileUploaded() started";
 
     auto *reply = qobject_cast<QNetworkReply *>(sender());
 
     if (!reply) {
+        qCritical() << "Uguu: Invalid network reply.";
         setError(1);
         setErrorText(QStringLiteral("Invalid network reply."));
         emitResult();
@@ -129,13 +140,18 @@ void fileUploaded()
 
     const QByteArray responseData = reply->readAll();
 
-    qWarning() << "Uguu response:" << responseData;
+    qInfo() << "Uguu response:" << responseData;
 
     if (reply->error() != QNetworkReply::NoError) {
+        qCritical() << "Uguu: " << reply->errorString();
         setError(1);
         setErrorText(reply->errorString());
-
+        QNetworkAccessManager *manager = reply->manager();
         reply->deleteLater();
+        if(manager)
+        {
+            manager->deleteLater();
+        }
         emitResult();
         return;
     }
@@ -146,13 +162,19 @@ void fileUploaded()
         QJsonDocument::fromJson(responseData, &parseError);
 
     if (parseError.error != QJsonParseError::NoError) {
+        qCritical() << QStringLiteral("Uguu: Could not parse Uguu response: %1").arg(parseError.errorString());
         setError(1);
         setErrorText(
             QStringLiteral("Could not parse Uguu response: %1")
                 .arg(parseError.errorString())
         );
 
+        QNetworkAccessManager *manager = reply->manager();
         reply->deleteLater();
+        if(manager)
+        {
+            manager->deleteLater();
+        }
         emitResult();
         return;
     }
@@ -161,12 +183,35 @@ void fileUploaded()
 
     const QJsonArray files =
         root.value(QStringLiteral("files")).toArray();
+    const QJsonValue success = root.value(QStringLiteral("success"));
+    if(!success.toBool())
+    {
+        const QJsonValue code = root.value(QStringLiteral("errorcode"));
+        const QJsonValue desc = root.value(QStringLiteral("description"));
+        setError(1);
+        qCritical() << "Uguu: returned an error with the code "<< code.toString() <<"\n error description: "<<desc.toString();
+        setErrorText(QStringLiteral("Uguu couldn't upload the files\n Error: ")+desc.toString());
 
+        QNetworkAccessManager *manager = reply->manager();
+        reply->deleteLater();
+        if(manager)
+        {
+            manager->deleteLater();
+        }
+        emitResult();
+        return;
+    }
     if (files.isEmpty()) {
         setError(1);
+        qCritical() << "Uguu: Uguu returned no uploaded files.";
         setErrorText(QStringLiteral("Uguu returned no uploaded files."));
 
+        QNetworkAccessManager *manager = reply->manager();
         reply->deleteLater();
+        if(manager)
+        {
+            manager->deleteLater();
+        }
         emitResult();
         return;
     }
@@ -179,14 +224,20 @@ void fileUploaded()
 
     if (url.isEmpty()) {
         setError(1);
+        qCritical() << "Uguu: Uguu returned no URL.";
         setErrorText(QStringLiteral("Uguu returned no URL."));
 
+        QNetworkAccessManager *manager = reply->manager();
         reply->deleteLater();
+        if(manager)
+        {
+            manager->deleteLater();
+        }
         emitResult();
         return;
     }
 
-    qWarning() << "Uguu uploaded URL:" << url;
+    qInfo() << "Uguu uploaded URL:" << url;
 
     setOutput(
         QJsonObject{
@@ -194,7 +245,12 @@ void fileUploaded()
         }
     );
 
+    QNetworkAccessManager *manager = reply->manager();
     reply->deleteLater();
+    if(manager)
+    {
+        manager->deleteLater();
+    }
     QGuiApplication::clipboard()->setText(url);
 
     KNotification::event(
@@ -204,8 +260,7 @@ void fileUploaded()
         "Upload complete.<br>"
         "<a href=\"%1\">%1</a><br><br>"
         "The URL has been copied to the clipboard."
-    ).arg(url),
-    KNotification::Persistent
+    ).arg(url)
     );
 
     emitResult();

@@ -10,4 +10,4 @@ target_link_libraries(
     Qt6::Network
     KF6::Purpose
     KF6::Notifications
-)
+) 

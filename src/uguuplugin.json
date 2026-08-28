@@ -10,7 +10,10 @@
     "X-Purpose-Constraints": [
         [
             "mimeType:image/png",
-            "mimeType:image/jpeg"
+            "mimeType:image/jpeg",
+            "mimeType:image/gif",
+            "mimeType:image/svg",
+            "mimeType:image/webp"
         ]
     ],
     "X-Purpose-PluginTypes": [
